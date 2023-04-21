@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.example.exercise.dal.SQLiteHelper;
 import com.example.exercise.model.Item;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class UpdateDeleteActivity extends AppCompatActivity implements View.OnCl
     private TextView tvDate;
     private Button btUpdate, btRemove, btAdd;
     private Item item;
-
+    String[] categories;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +47,13 @@ public class UpdateDeleteActivity extends AppCompatActivity implements View.OnCl
         btUpdate.setOnClickListener(this);
         btAdd.setOnClickListener(this);
         btRemove.setOnClickListener(this);
-
+        categories = getResources().getStringArray(R.array.category);
+        spCategory.setAdapter(new ArrayAdapter<String>(this,R.layout.item_spinner,categories));
+        for(int i = 0; i < categories.length ; i++){
+            if(categories[i].equals(item.getCategory())){
+                spCategory.setSelection(i);
+            }
+        }
         tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,13 +90,6 @@ public class UpdateDeleteActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onClick(View view) {
 
-        String[] categories = getResources().getStringArray(R.array.category);
-        spCategory.setAdapter(new ArrayAdapter<String>(this,R.layout.item_spinner,categories));
-        for(int i = 0; i < categories.length ; i++){
-            if(categories[i].equals(item.getCategory())){
-                spCategory.setSelection(i);
-            }
-        }
         String title = edTitle.getText().toString();
         String category = spCategory.getSelectedItem().toString();
         String price = edPrice.getText().toString();
@@ -97,7 +97,7 @@ public class UpdateDeleteActivity extends AppCompatActivity implements View.OnCl
         SQLiteHelper  sql = new SQLiteHelper(this);
 
         if(view == btUpdate){
-            Log.e("CLick here", "Update");
+            Log.e("CLick here", category);
             item.setTitle(title);
             item.setCategory(category);
             item.setPrice(price);

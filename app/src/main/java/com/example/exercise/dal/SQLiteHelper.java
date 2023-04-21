@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -12,6 +13,7 @@ import com.example.exercise.model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "ChiTieu.db";
@@ -100,13 +102,30 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         sql.delete("items","id=?",args);
     }
 
-    public List<Item> findBy(String s){
+    public List<Item> findBy(Map<String, String> m){
         List<Item> items = new ArrayList<>();
         SQLiteDatabase st = getReadableDatabase();
         String order = "date DESC";
-        String q = "title like ?";
-        String[] args = {"%"+s+"%"};
-        Cursor cursor = st.query("items",null, q, args,null,null,order);
+        String q = "";
+        List<String> a = new ArrayList<>();
+
+        for(String key:  m.keySet()){
+            if(q.length() > 0){
+                q =  q + " and ";
+            }
+            Log.e("Query", q);
+            if(key == "title"){
+                q += " title like ? ";
+                a.add("%"+m.get(key)+"%");
+            }else{
+                q += " category like ? ";
+                a.add(m.get(key));
+            }
+        }
+        Log.e("Total query", q);
+
+
+        Cursor cursor = st.query("items",null, q, a.toArray(new String[a.size()]),null,null,order);
         while (cursor != null && cursor.moveToNext()){
             int id = cursor.getInt(0);
             String title = cursor.getString(1);
